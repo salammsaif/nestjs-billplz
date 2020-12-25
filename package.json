@@ -1,11 +1,11 @@
 {
-  "name": "@nestjsplus/nestjs-package-starter",
+  "name": "@msaifmfz/nestjs-billplz",
   "version": "1.0.0",
-  "description": "NestJS npm package starter",
-  "author": "John Biundo <johnfbiundo@gmail.com>",
-  "license": "MIT",
+  "description": "Billplz API wrapper",
+  "author": "Saif <msaifmfz@gmail.com>",
+  "license": "",
   "readmeFilename": "README.md",
-  "main": "dist/test.js",
+  "main": "dist/index.js",
   "files": [
     "dist/**/*",
     "*.md"
@@ -29,31 +29,37 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nestjsplus/nestjs-package-starter"
+    "url": "https://github.com/salammsaif/nestjs-billplz"
   },
-  "bugs": "https://github.com/nestjsplus/nestjs-package-starter",
+  "bugs": "https://github.com/salammsaif/nestjs-billplz/issues",
   "peerDependencies": {
-    "@nestjs/common": "^6.0.0"
+    "@nestjs/common": "^7.0.0"
   },
   "dependencies": {},
   "devDependencies": {
-    "@nestjs/common": "^6.0.0",
-    "@nestjs/core": "^6.0.0",
-    "@nestjs/platform-express": "^6.0.0",
-    "@nestjs/testing": "6.1.1",
-    "@types/express": "4.16.1",
-    "@types/jest": "24.0.11",
-    "@types/node": "11.13.4",
-    "@types/supertest": "2.0.7",
-    "jest": "24.7.1",
-    "prettier": "1.17.0",
-    "supertest": "4.0.2",
-    "ts-jest": "24.0.2",
-    "ts-node": "8.1.0",
+    "@nestjs/common": "^7.0.0",
+    "@nestjs/core": "^7.0.0",
+    "@nestjs/platform-express": "^7.0.0",
+    "@nestjs/testing": "^7.0.0",
+    "@nestjs/cli": "^7.0.0",
+    "@nestjs/schematics": "^7.0.0",
+    "@types/express": "^4.17.3",
+    "@types/jest": "26.0.10",
+    "@types/node": "^13.9.1",
+    "@types/supertest": "^2.0.8",
     "tsc-watch": "2.2.1",
-    "tsconfig-paths": "3.8.0",
     "tslint": "5.16.0",
-    "typescript": "3.4.3"
+    "eslint": "7.7.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-import": "^2.20.1",
+    "jest": "26.4.2",
+    "prettier": "^1.19.1",
+    "supertest": "^4.0.2",
+    "ts-jest": "26.2.0",
+    "ts-loader": "^6.2.1",
+    "ts-node": "9.0.0",
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^3.7.4"
   },
   "jest": {
     "moduleFileExtensions": [

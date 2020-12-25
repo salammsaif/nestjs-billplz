@@ -1,4 +1,3 @@
-// export public api from here
-// for example:
-// export * from './decorators';
-export * from './test';
+export * from './billplz/billplz.definition';
+export * from './billplz/billplz.module';
+export * from './billplz/billplz.service';
