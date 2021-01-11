@@ -110,5 +110,6 @@ export interface CreateBillResponse {
 
 export interface GetFPXBankListResponse {
   name: string;
+  display_bank_name: string;
   active: boolean;
 }

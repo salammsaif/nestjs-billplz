@@ -1,6 +1,6 @@
 {
   "name": "@msaifmfz/nestjs-billplz",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Billplz API wrapper",
   "author": "Saif <msaifmfz@gmail.com>",
   "license": "",
