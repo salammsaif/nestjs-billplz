@@ -1,4 +1,10 @@
-import { LoggerService, HttpService, Injectable, Optional, Inject } from '@nestjs/common';
+import {
+  LoggerService,
+  HttpService,
+  Injectable,
+  Optional,
+  Inject,
+} from '@nestjs/common';
 import * as crypto from 'crypto';
 import * as _ from 'lodash';
 import {
@@ -8,14 +14,14 @@ import {
   GetCollectionResponse,
   CardProvider,
   CreateBill,
-  CreateBillResponse, GetFPXBankListResponse,
+  CreateBillResponse,
+  GetFPXBankListResponse,
   HttpMethod,
   Version,
 } from './billplz.definition';
 
 @Injectable()
 export class BillPlzService {
-
   // billplz api endpoints
   readonly BASE_URL_V3 = 'https://www.billplz.com/api/v3';
   readonly BASE_URL_V4 = 'https://www.billplz.com/api/v4';
@@ -49,26 +55,26 @@ export class BillPlzService {
   };
 
   readonly PAYMENT_GATEWAY_ABBR = {
-    'ABMB0212': 'Alliance Bank',
-    'ABB0233': 'Affin Bank',
-    'AMBB0209': 'AmBank',
-    'BCBB0235': 'CIMB Clicks',
-    'BIMB0340': 'Bank Islam',
-    'BKRM0602': 'Bank Rakyat',
-    'BMMB0341': 'Bank Muamalat',
-    'BSN0601': 'BSN',
-    'CIT0217': 'Citibank Berhad',
-    'HLB0224': 'Hong Leong Bank',
-    'HSBC0223': 'HSBC Bank',
-    'KFH0346': 'Kuwait Finance House',
-    'MB2U0227': 'Maybank2u',
-    'MBB0227': 'Maybank2E',
-    'MBB0228': 'Maybank2E',
-    'OCBC0229': 'OCBC Bank',
-    'PBB0233': 'Public Bank',
-    'RHB0218': 'RHB Now',
-    'SCB0216': 'Standard Chartered',
-    'UOB0226': 'UOB Bank',
+    ABMB0212: 'Alliance Bank',
+    ABB0233: 'Affin Bank',
+    AMBB0209: 'AmBank',
+    BCBB0235: 'CIMB Clicks',
+    BIMB0340: 'Bank Islam',
+    BKRM0602: 'Bank Rakyat',
+    BMMB0341: 'Bank Muamalat',
+    BSN0601: 'BSN',
+    CIT0217: 'Citibank Berhad',
+    HLB0224: 'Hong Leong Bank',
+    HSBC0223: 'HSBC Bank',
+    KFH0346: 'Kuwait Finance House',
+    MB2U0227: 'Maybank2u',
+    MBB0227: 'Maybank2E',
+    MBB0228: 'Maybank2E',
+    OCBC0229: 'OCBC Bank',
+    PBB0233: 'Public Bank',
+    RHB0218: 'RHB Now',
+    SCB0216: 'Standard Chartered',
+    UOB0226: 'UOB Bank',
     'BP-PPL01': 'PayPal',
     'BP-2C2P1': 'e-pay',
     'BP-2C2PC': 'Visa / Mastercard',
@@ -78,13 +84,13 @@ export class BillPlzService {
     'BP-SGP01': 'Senangpay',
 
     // only applicable in staging environment
-    'TEST0001': 'Test 0001',
-    'TEST0002': 'Test 0002',
-    'TEST0003': 'Test 0003',
-    'TEST0004': 'Test 0004',
-    'TEST0021': 'Test 0021',
-    'TEST0022': 'Test 0022',
-    'TEST0023': 'Test 0023',
+    TEST0001: 'Test 0001',
+    TEST0002: 'Test 0002',
+    TEST0003: 'Test 0003',
+    TEST0004: 'Test 0004',
+    TEST0021: 'Test 0021',
+    TEST0022: 'Test 0022',
+    TEST0023: 'Test 0023',
     'BP-FKR01': 'Billplz Simulator',
   };
 
@@ -108,8 +114,8 @@ export class BillPlzService {
 
   constructor(
     private httpService: HttpService,
-    @Inject(CONFIG_OPTIONS) options: BillPlzOptions) {
-
+    @Inject(CONFIG_OPTIONS) options: BillPlzOptions,
+  ) {
     this.debugMode = options.debugMode || true;
     this.sandbox = options.sandbox;
     this.apiKey = options.apiKey;
@@ -121,7 +127,8 @@ export class BillPlzService {
     this.payoutID = options.payoutID || null;
     this.cardID = options.cardID || null;
     this.cardToken = options.cardToken || null;
-    this.cardProvider = options.cardProvider || CardProvider.CARD_PROVIDER_SENANGPAY;
+    this.cardProvider =
+      options.cardProvider || CardProvider.CARD_PROVIDER_SENANGPAY;
 
     this.logService = options.logger;
 
@@ -134,7 +141,9 @@ export class BillPlzService {
   }
 
   private debug(data) {
-    if (this.debugMode && this.logService) { this.logService.debug(data); }
+    if (this.debugMode && this.logService) {
+      this.logService.debug(data);
+    }
   }
 
   setBaseUrl() {
@@ -193,34 +202,35 @@ export class BillPlzService {
   }
 
   private getApiCaller(httpMethod: HttpMethod, url: string, actionName = '') {
-    const headers = {
-      Authorization: `Basic ${this.apiKey}`,
-    };
-
-    const handleResponse = (response) => {
+    const handleResponse = response => {
       const data = response.data;
-      this.debug(JSON.stringify({
-        source: 'BillPlzService',
-        actionName,
-        status: _.get(response, 'status'),
-        statusText: _.get(response, 'statusText'),
-      }));
+      this.debug(
+        JSON.stringify({
+          source: 'BillPlzService',
+          actionName,
+          status: _.get(response, 'status'),
+          statusText: _.get(response, 'statusText'),
+        }),
+      );
       return data;
     };
 
-    const handlerError = (error) => {
-      this.debug(JSON.stringify({
-        source: 'BillPlzService',
-        actionName,
-        status: _.get(error, 'response.status'),
-        statusText: _.get(error, 'response.statusText'),
-        body: _.get(error, 'response.data'),
-      }));
+    const handlerError = error => {
+      this.debug(
+        JSON.stringify({
+          source: 'BillPlzService',
+          actionName,
+          status: _.get(error, 'response.status'),
+          statusText: _.get(error, 'response.statusText'),
+          body: _.get(error, 'response.data'),
+        }),
+      );
       throw error;
     };
 
     if (httpMethod === HttpMethod.GET) {
       return (options = {}) => {
+        const headers = this.buildHttpHeader({}, options);
         return this.httpService
           .get(url, { headers, ...options })
           .toPromise()
@@ -231,6 +241,7 @@ export class BillPlzService {
 
     if (httpMethod === HttpMethod.DELETE) {
       return (options = {}) => {
+        const headers = this.buildHttpHeader({}, options);
         return this.httpService
           .delete(url, { headers, ...options })
           .toPromise()
@@ -241,6 +252,7 @@ export class BillPlzService {
 
     if (httpMethod === HttpMethod.POST) {
       return (data = {}, options = {}) => {
+        const headers = this.buildHttpHeader({}, options);
         return this.httpService
           .post(url, data, { headers, ...options })
           .toPromise()
@@ -251,6 +263,7 @@ export class BillPlzService {
 
     if (httpMethod === HttpMethod.PUT) {
       return (data = {}, options = {}) => {
+        const headers = this.buildHttpHeader({}, options);
         return this.httpService
           .put(url, data, { headers, ...options })
           .toPromise()
@@ -261,6 +274,7 @@ export class BillPlzService {
 
     if (httpMethod === HttpMethod.PATCH) {
       return (data = {}, options = {}) => {
+        const headers = this.buildHttpHeader({}, options);
         return this.httpService
           .patch(url, data, { headers, ...options })
           .toPromise()
@@ -268,6 +282,16 @@ export class BillPlzService {
           .catch(handlerError);
       };
     }
+  }
+
+  private buildHttpHeader(headers, options: any) {
+    if (options.apiKey) {
+      headers.Authorization = `Basic ${options.apiKey}`;
+      delete options.apiKey;
+    } else {
+      headers.Authorization = `Basic ${this.apiKey}`;
+    }
+    return headers;
   }
 
   /**
@@ -278,13 +302,12 @@ export class BillPlzService {
    * @returns {*}
    * @link https://www.billplz.com/api?shell#v3-collections-create-a-collection
    */
-  async createCollection(data: CreateCollection, options = {}): Promise<GetCollectionResponse[]> {
+  async createCollection(
+    data: CreateCollection,
+    options: { apiKey?: string } = {},
+  ): Promise<GetCollectionResponse[]> {
     const url = this.getUrl() + '/collections';
-    const api = this.getApiCaller(
-      HttpMethod.POST,
-      url,
-      'createCollection',
-    );
+    const api = this.getApiCaller(HttpMethod.POST, url, 'createCollection');
     return await api(data, options);
   }
 
@@ -295,8 +318,12 @@ export class BillPlzService {
    * @returns {*}
    * @link https://www.billplz.com/api?shell#v3-collections-get-a-collection
    */
-  async getCollection(collectionID?: string, options = {}): Promise<GetCollectionResponse[]> {
-    const url = this.getUrl() + '/collections/' + (collectionID || this.collectionID);
+  async getCollection(
+    collectionID?: string,
+    options: { apiKey?: string } = {},
+  ): Promise<GetCollectionResponse[]> {
+    const url =
+      this.getUrl() + '/collections/' + (collectionID || this.collectionID);
     const api = this.getApiCaller(HttpMethod.GET, url, 'getCollection');
     return await api(options);
   }
@@ -308,7 +335,10 @@ export class BillPlzService {
    * @returns {*}
    * @link https://www.billplz.com/api?shell#v3-bills-create-a-bill
    */
-  async createBill(data: CreateBill, options = {}): Promise<CreateBillResponse> {
+  async createBill(
+    data: CreateBill,
+    options: { apiKey?: string } = {},
+  ): Promise<CreateBillResponse> {
     data = { collection_id: this.collectionID, ...data };
 
     const url = this.getUrl() + '/bills';
@@ -349,28 +379,30 @@ export class BillPlzService {
    * @returns {*}
    * @link https://www.billplz.com/api?shell#v3-get-fpx-banks
    */
-  async getFPXBankList(activeOnly = false, options = {}): Promise<GetFPXBankListResponse[]> {
-    const filterActive = (data) => {
+  async getFPXBankList(
+    activeOnly = false,
+    options: { apiKey?: string } = {},
+  ): Promise<GetFPXBankListResponse[]> {
+    const filterActive = data => {
       return data.active === true;
     };
 
-    const setDisplayBankName = (data) => {
+    const setDisplayBankName = data => {
       data.display_bank_name = this.PAYMENT_GATEWAY_ABBR[data.name] || '';
       return data;
     };
 
     const url = this.getUrl(Version.V3) + '/fpx_banks';
     const api = this.getApiCaller(HttpMethod.GET, url, 'getFPXBankList');
-    return await api(options)
-      .then((data) => {
-        let results = data.banks;
-        results = results.map(setDisplayBankName);
-        if (activeOnly) {
-          return results.filter(filterActive);
-        } else {
-          return results;
-        }
-      });
+    return await api(options).then(data => {
+      let results = data.banks;
+      results = results.map(setDisplayBankName);
+      if (activeOnly) {
+        return results.filter(filterActive);
+      } else {
+        return results;
+      }
+    });
   }
 
   /**
@@ -397,7 +429,7 @@ export class BillPlzService {
     ];
 
     let targetString = '';
-    targetKeys.map((key) => {
+    targetKeys.map(key => {
       if (data[key] !== undefined) {
         targetString += `${key}${data[key]}|`;
       }
@@ -413,7 +445,6 @@ export class BillPlzService {
     const calculatedXSig = hmac.digest('hex');
     return calculatedXSig === data.x_signature;
   }
-
 }
 
 /*__setAccountNumber(accountNumber: string): this {
@@ -521,7 +552,7 @@ export class BillPlzService {
  */
 /*__getOpenCollection(
   collectionID = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl() + '/open_collections/' + (collectionID || this.collectionID);
@@ -558,7 +589,7 @@ export class BillPlzService {
  */
 /*__deactivateCollection(
   collectionID = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl(this.CONSTANTS.VERSION_V3) +
@@ -582,7 +613,7 @@ export class BillPlzService {
  */
 /*__activateCollection(
   collectionID = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl(this.CONSTANTS.VERSION_V3) +
@@ -606,7 +637,7 @@ export class BillPlzService {
  */
 /*__getBankAccountVerification(
   accountNumber = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl() +
@@ -650,7 +681,7 @@ export class BillPlzService {
  */
 /*__getPaymentMethodList(
   collectionID = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl(this.CONSTANTS.VERSION_V3) +
@@ -676,7 +707,7 @@ export class BillPlzService {
 /*__updatePaymentMethod(
   collectionID = null,
   data = {},
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl(this.CONSTANTS.VERSION_V3) +
@@ -700,7 +731,7 @@ export class BillPlzService {
  */
 /*__getBankAccountVerifyList(
   accountNumbers = [],
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   let accountNumberParams = '';
   accountNumbers.map(function(accountNumber) {
@@ -729,7 +760,7 @@ export class BillPlzService {
  */
 /*__getBankAccountVerify(
   accountNumber = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl(this.CONSTANTS.VERSION_V3) +
@@ -770,7 +801,7 @@ export class BillPlzService {
  */
 /*__activateReceiptDelivery(
   collectionID = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl(this.CONSTANTS.VERSION_V4) +
@@ -794,7 +825,7 @@ export class BillPlzService {
  */
 /*__deactivateReceiptDelivery(
   collectionID = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl(this.CONSTANTS.VERSION_V4) +
@@ -818,7 +849,7 @@ export class BillPlzService {
  */
 /*__setReceiptDeliveryUseGlobal(
   collectionID = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl(this.CONSTANTS.VERSION_V4) +
@@ -842,7 +873,7 @@ export class BillPlzService {
  */
 /*__getReceiptDeliveryConfig(
   collectionID = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl(this.CONSTANTS.VERSION_V4) +
@@ -885,7 +916,7 @@ export class BillPlzService {
  */
 /*__getPayoutCollection(
   payoutCollectionID = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const url =
     this.getUrl(this.CONSTANTS.VERSION_V4) +
@@ -950,7 +981,7 @@ export class BillPlzService {
  */
 /*getPaymentGateways(
   activeOnly = true,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   const filterActive = (data) => {
     return data.active === true;
@@ -990,7 +1021,7 @@ export class BillPlzService {
  */
 /*__createCard(
   data = {},
-  options = {},
+    options: { apiKey?: string } = {},
   provider = null,
 ) {
   provider = provider || this.cardProvider;
@@ -1018,7 +1049,7 @@ export class BillPlzService {
 /*__deleteCard(
   cardID = null,
   provider = null,
-  options = {},
+    options: { apiKey?: string } = {},
 ) {
   provider = provider || this.cardProvider;
   let endpoint;
@@ -1051,7 +1082,7 @@ export class BillPlzService {
 /*__chargeCard(
   billID = null,
   data = {},
-  options = {},
+    options: { apiKey?: string } = {},
   provider = null,
 ) {
   data = { ...{ card_id: this.cardID, token: this.cardToken }, ...data };
