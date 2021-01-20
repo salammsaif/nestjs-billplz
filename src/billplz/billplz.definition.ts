@@ -87,6 +87,21 @@ export interface CreateBill {
   reference_2?: string;
 }
 
+export interface CreateFpxBankBill {
+  collection_id?: string;
+  email: string;
+  mobile?: string;
+  name: string;
+  amount: number;
+  callback_url: string;
+  description: string;
+  due_at?: string;
+  redirect_url?: string;
+  deliver?: string;
+  reference_2_label?: string;
+  reference_2?: string;
+}
+
 export interface CreateBillResponse {
   id: string;
   collection_id: string;

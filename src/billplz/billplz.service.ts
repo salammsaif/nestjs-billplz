@@ -18,6 +18,7 @@ import {
   GetFPXBankListResponse,
   HttpMethod,
   Version,
+  CreateFpxBankBill,
 } from './billplz.definition';
 
 @Injectable()
@@ -344,6 +345,32 @@ export class BillPlzService {
     const url = this.getUrl() + '/bills';
     const api = this.getApiCaller(HttpMethod.POST, url, 'createBill');
     return await api(data, options);
+  }
+
+  /**
+   * Create bill that auto submit to fpx banks
+   * @param data Object
+   * @param options Object Options for http config
+   * @returns {*}
+   * @link https://www.billplz.com/api?shell#v3-bills-create-a-bill
+   */
+  async createFpxBankBill(
+    data: CreateFpxBankBill,
+    bankCode: string,
+    options: { apiKey?: string } = {},
+  ): Promise<CreateBillResponse> {
+    let newData: CreateBill = data;
+    newData.reference_1_label = 'Bank Code';
+    newData.reference_1 = bankCode;
+
+    return await this.createBill(newData, options);
+  }
+
+  /**
+   * Get url that auto-redirect to fpx bank
+   */
+  getAutoSubmitBillUrl(url: string): string {
+    return url + '?auto_submit=true';
   }
 
   /**
