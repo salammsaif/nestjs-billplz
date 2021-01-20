@@ -371,8 +371,8 @@ export class BillPlzService {
   /**
    * Get url that auto-redirect to fpx bank
    */
-  getAutoSubmitBillUrl(url: string): string {
-    return url + '?auto_submit=true';
+  getAutoSubmitBillUrl(billCode: string): string {
+    return this.getUrl() + '/bills' + '?auto_submit=true';
   }
 
   /**
