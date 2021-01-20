@@ -209,6 +209,7 @@ export class BillPlzService {
         JSON.stringify({
           source: 'BillPlzService',
           actionName,
+          url,
           status: _.get(response, 'status'),
           statusText: _.get(response, 'statusText'),
         }),
