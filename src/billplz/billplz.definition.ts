@@ -15,6 +15,12 @@ export enum CollectionStatus {
   INACTIVE = 'inactive',
 }
 
+export enum CallbackState {
+  DUE = 'due',
+  DELETED = 'deleted',
+  PAID = 'paid',
+}
+
 export interface BillPlzOptions {
   debugMode?: boolean;
   apiKey: string;
