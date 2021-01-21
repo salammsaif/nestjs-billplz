@@ -308,7 +308,7 @@ export class BillPlzService {
   async createCollection(
     data: CreateCollection,
     options: { apiKey?: string } = {},
-  ): Promise<GetCollectionResponse[]> {
+  ): Promise<GetCollectionResponse> {
     const url = this.getUrl() + '/collections';
     const api = this.getApiCaller(HttpMethod.POST, url, 'createCollection');
     return await api(data, options);
@@ -324,7 +324,7 @@ export class BillPlzService {
   async getCollection(
     collectionID?: string,
     options: { apiKey?: string } = {},
-  ): Promise<GetCollectionResponse[]> {
+  ): Promise<GetCollectionResponse> {
     const url =
       this.getUrl() + '/collections/' + (collectionID || this.collectionID);
     const api = this.getApiCaller(HttpMethod.GET, url, 'getCollection');
