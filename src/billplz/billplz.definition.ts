@@ -134,3 +134,62 @@ export interface GetFPXBankListResponse {
   display_bank_name: string;
   active: boolean;
 }
+
+export interface PayoutCollection {
+  id: string;
+  title: string;
+  mass_payment_instructions_count: string;
+  paid_amount: string;
+  status: string;
+}
+
+export interface CreatePayout {
+  mass_payment_instruction_collection_id: string;
+  bank_code: string;
+  bank_account_number: string;
+  identity_number: string;
+  name: string;
+  description: string;
+  total: number;
+  email?: string;
+  notification?: boolean;
+  recipient_notification?: boolean;
+  reference_id?: string;
+}
+
+export interface Payout extends CreatePayout {
+  id: string;
+  status: PayoutStatus;
+}
+
+export enum PayoutStatus {
+  PROCESSING = 'processing',
+  COMPLETED = 'completed',
+  REFUNDED = 'refunded',
+}
+
+export interface BankAccount {
+  name: string;
+  id_no: string;
+  acc_no: string;
+  code: string;
+  organization: boolean;
+  authorization_date: string;
+  status: BankAccountStatus;
+  processed_at: string;
+  rejected_desc: string;
+}
+
+export interface CreateBankAccount {
+  name: string;
+  id_no: string;
+  acc_no: string;
+  code: string;
+  organization: true;
+}
+
+export enum BankAccountStatus {
+  PENDING = 'pending',
+  VERIFIED = 'verified',
+  REJECTED = 'rejected',
+}

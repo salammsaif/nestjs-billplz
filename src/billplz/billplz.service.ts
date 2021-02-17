@@ -1,24 +1,22 @@
-import {
-  LoggerService,
-  HttpService,
-  Injectable,
-  Optional,
-  Inject,
-} from '@nestjs/common';
+import { HttpService, Inject, Injectable, LoggerService } from '@nestjs/common';
 import * as crypto from 'crypto';
 import * as _ from 'lodash';
 import {
-  CONFIG_OPTIONS,
+  BankAccount,
   BillPlzOptions,
-  CreateCollection,
-  GetCollectionResponse,
   CardProvider,
+  CONFIG_OPTIONS, CreateBankAccount,
   CreateBill,
   CreateBillResponse,
+  CreateCollection,
+  CreateFpxBankBill,
+  CreatePayout,
+  GetCollectionResponse,
   GetFPXBankListResponse,
   HttpMethod,
+  Payout,
+  PayoutCollection,
   Version,
-  CreateFpxBankBill,
 } from './billplz.definition';
 
 @Injectable()
@@ -56,26 +54,26 @@ export class BillPlzService {
   };
 
   readonly PAYMENT_GATEWAY_ABBR = {
-    ABMB0212: 'Alliance Bank',
-    ABB0233: 'Affin Bank',
-    AMBB0209: 'AmBank',
-    BCBB0235: 'CIMB Clicks',
-    BIMB0340: 'Bank Islam',
-    BKRM0602: 'Bank Rakyat',
-    BMMB0341: 'Bank Muamalat',
-    BSN0601: 'BSN',
-    CIT0217: 'Citibank Berhad',
-    HLB0224: 'Hong Leong Bank',
-    HSBC0223: 'HSBC Bank',
-    KFH0346: 'Kuwait Finance House',
-    MB2U0227: 'Maybank2u',
-    MBB0227: 'Maybank2E',
-    MBB0228: 'Maybank2E',
-    OCBC0229: 'OCBC Bank',
-    PBB0233: 'Public Bank',
-    RHB0218: 'RHB Now',
-    SCB0216: 'Standard Chartered',
-    UOB0226: 'UOB Bank',
+    'ABMB0212': 'Alliance Bank',
+    'ABB0233': 'Affin Bank',
+    'AMBB0209': 'AmBank',
+    'BCBB0235': 'CIMB Clicks',
+    'BIMB0340': 'Bank Islam',
+    'BKRM0602': 'Bank Rakyat',
+    'BMMB0341': 'Bank Muamalat',
+    'BSN0601': 'BSN',
+    'CIT0217': 'Citibank Berhad',
+    'HLB0224': 'Hong Leong Bank',
+    'HSBC0223': 'HSBC Bank',
+    'KFH0346': 'Kuwait Finance House',
+    'MB2U0227': 'Maybank2u',
+    'MBB0227': 'Maybank2E',
+    'MBB0228': 'Maybank2E',
+    'OCBC0229': 'OCBC Bank',
+    'PBB0233': 'Public Bank',
+    'RHB0218': 'RHB Now',
+    'SCB0216': 'Standard Chartered',
+    'UOB0226': 'UOB Bank',
     'BP-PPL01': 'PayPal',
     'BP-2C2P1': 'e-pay',
     'BP-2C2PC': 'Visa / Mastercard',
@@ -85,13 +83,13 @@ export class BillPlzService {
     'BP-SGP01': 'Senangpay',
 
     // only applicable in staging environment
-    TEST0001: 'Test 0001',
-    TEST0002: 'Test 0002',
-    TEST0003: 'Test 0003',
-    TEST0004: 'Test 0004',
-    TEST0021: 'Test 0021',
-    TEST0022: 'Test 0022',
-    TEST0023: 'Test 0023',
+    'TEST0001': 'Test 0001',
+    'TEST0002': 'Test 0002',
+    'TEST0003': 'Test 0003',
+    'TEST0004': 'Test 0004',
+    'TEST0021': 'Test 0021',
+    'TEST0022': 'Test 0022',
+    'TEST0023': 'Test 0023',
     'BP-FKR01': 'Billplz Simulator',
   };
 
@@ -174,6 +172,16 @@ export class BillPlzService {
 
   setBillID(billID: string): this {
     this.billID = billID;
+    return this;
+  }
+
+  setPayoutCollectionID(payoutCollectionID: string): this {
+    this.payoutCollectionID = payoutCollectionID;
+    return this;
+  }
+
+  setPayoutID(payoutID: string): this {
+    this.payoutID = payoutID;
     return this;
   }
 
@@ -361,7 +369,7 @@ export class BillPlzService {
     bankCode: string,
     options: { apiKey?: string } = {},
   ): Promise<CreateBillResponse> {
-    let newData: CreateBill = data;
+    const newData: CreateBill = data;
     newData.reference_1_label = 'Bank Code';
     newData.reference_1 = bankCode;
 
@@ -436,6 +444,115 @@ export class BillPlzService {
 
   /**
    *
+   * @param payoutCollectionID
+   * @param options Object Options for http config
+   * @returns {*}
+   * @link https://www.billplz.com/api?shell#v4-payout-collections-get-a-payout-collection
+   */
+  async getPayoutCollection(
+    payoutCollectionID = null,
+    options: { apiKey?: string } = {},
+  ): Promise<PayoutCollection> {
+    const url = this.getUrl(Version.V4) + '/mass_payment_instruction_collections/' + (payoutCollectionID || this.payoutCollectionID);
+    const api = this.getApiCaller(HttpMethod.GET, url, 'getPayoutCollection');
+    return await api(options);
+  }
+
+  /**
+   *
+   * @param data Object
+   * @param options Object Options for http config
+   * @returns {*}
+   * @link https://www.billplz.com/api?shell#v4-payout-create-a-payout
+   */
+  async createPayout(
+    data: CreatePayout,
+    options: { apiKey?: string } = {},
+  ): Promise<Payout> {
+    const url = this.getUrl(Version.V4) + '/mass_payment_instructions';
+    const api = this.getApiCaller(HttpMethod.POST, url, 'createPayout');
+    return await api(data, options);
+  }
+
+  /**
+   *
+   * @param payoutID
+   * @param options Object Options for http config
+   * @returns {*}
+   * @link https://www.billplz.com/api?shell#v4-payout-get-a-payout
+   */
+  async getPayout(
+    payoutID?: string,
+    options: { apiKey?: string } = {},
+  ): Promise<Payout> {
+    const url = this.getUrl(Version.V4) + '/mass_payment_instructions/' + (payoutID || this.payoutID);
+    const api = this.getApiCaller(HttpMethod.GET, url, 'getPayout');
+    return await api(options);
+  }
+
+  /**
+   * Get payout bank codes
+   */
+  getPayoutBankCode() {
+    return this.BANK_CODES;
+  }
+
+  /**
+   *
+   * @param accountNumbers
+   * @param options Object Options for http config
+   * @returns {*}
+   * @link https://www.billplz.com/api?shell#v3-bank-account-direct-verification-get-bank-account-index
+   */
+  async getBankAccountVerifyList(
+    accountNumbers = [],
+    options: { apiKey?: string } = {},
+  ): Promise<BankAccount[]> {
+    let accountNumberParams = '';
+    accountNumbers.map((accountNumber) => {
+      accountNumberParams += 'account_numbers[]=' + accountNumber + '&';
+    });
+    accountNumberParams = accountNumberParams.slice(0, -1);
+
+    const url = this.getUrl(Version.V3) + '/bank_verification_services?' + accountNumberParams;
+    const api = this.getApiCaller(HttpMethod.GET, url, 'getBankAccountVerifyList');
+    return await api(options).then((data) => data.bank_verification_services);
+  }
+
+  /**
+   *
+   * @param accountNumber
+   * @param options Object Options for http config
+   * @returns {*}
+   * @link https://www.billplz.com/api?shell#v3-bank-account-direct-verification-get-a-bank-account
+   */
+  async getBankAccountVerify(
+    accountNumber?: string,
+    options: { apiKey?: string } = {},
+  ): Promise<BankAccount> {
+    const url = this.getUrl(Version.V3) + '/bank_verification_services/' + (accountNumber || this.accountNumber);
+    const api = this.getApiCaller(HttpMethod.GET, url, 'getBankAccountVerify');
+    return await api(options);
+  }
+
+  /**
+   *
+   * @param data Object
+   * @param options Object Options for http config
+   * @returns {*}
+   * @link https://www.billplz.com/api?shell#v3-bank-account-direct-verification-create-a-bank-account
+   */
+  async createBankAccount(
+    data: CreateBankAccount,
+    options: { apiKey?: string } = {},
+  ): Promise<BankAccount> {
+    const url = this.getUrl(Version.V3) + '/bank_verification_services';
+    const api = this.getApiCaller(HttpMethod.POST, url, 'createBankAccount');
+    return api(data, options);
+  }
+
+  /**
+   *
    * @param data Object
    * @param xSignatureKey
    * @returns {boolean}
@@ -478,16 +595,6 @@ export class BillPlzService {
 
 /*__setAccountNumber(accountNumber: string): this {
   this.accountNumber = accountNumber;
-  return this;
-};*/
-
-/*__setPayoutCollectionID(payoutCollectionID: string): this {
-  this.payoutCollectionID = payoutCollectionID;
-  return this;
-};*/
-
-/*__setPayoutID(payoutID: string): this {
-  this.payoutID = payoutID;
   return this;
 };*/
 
@@ -753,76 +860,6 @@ export class BillPlzService {
 
 /**
  *
- * @param accountNumbers
- * @param options Object Options for http config
- * @returns {*}
- * @link https://www.billplz.com/api?shell#v3-bank-account-direct-verification-get-bank-account-index
- */
-/*__getBankAccountVerifyList(
-  accountNumbers = [],
-    options: { apiKey?: string } = {},
-) {
-  let accountNumberParams = '';
-  accountNumbers.map(function(accountNumber) {
-    accountNumberParams += 'account_numbers[]=' + accountNumber + '&';
-  });
-  accountNumberParams = accountNumberParams.slice(0, -1);
-
-  const url =
-    this.getUrl(this.CONSTANTS.VERSION_V3) +
-    '/bank_verification_services?' +
-    accountNumberParams;
-  const api = this.getApiCaller(
-    HttpMethod.GET,
-    url,
-    'getBankAccountVerifyList',
-  );
-  return api(options).then((data) => data.bank_verification_services);
-};*/
-
-/**
- *
- * @param accountNumber
- * @param options Object Options for http config
- * @returns {*}
- * @link https://www.billplz.com/api?shell#v3-bank-account-direct-verification-get-a-bank-account
- */
-/*__getBankAccountVerify(
-  accountNumber = null,
-    options: { apiKey?: string } = {},
-) {
-  const url =
-    this.getUrl(this.CONSTANTS.VERSION_V3) +
-    '/bank_verification_services/' +
-    (accountNumber || this.accountNumber);
-  const api = this.getApiCaller(
-    HttpMethod.GET,
-    url,
-    'getBankAccountVerify',
-  );
-  return api(options);
-};*/
-
-/**
- *
- * @param data Object
- * @param options Object Options for http config
- * @returns {*}
- * @link https://www.billplz.com/api?shell#v3-bank-account-direct-verification-create-a-bank-account
- */
-/*__createBankAccount(data = {}, options = {}) {
-  const url =
-    this.getUrl(this.CONSTANTS.VERSION_V3) + '/bank_verification_services';
-  const api = this.getApiCaller(
-    HttpMethod.POST,
-    url,
-    'createBankAccount',
-  );
-  return api(data, options);
-};*/
-
-/**
- *
  * @param collectionID
  * @param options Object Options for http config
  * @returns {*}
@@ -934,59 +971,6 @@ export class BillPlzService {
     'createPayoutCollection',
   );
   return api({ title }, options);
-};*/
-
-/**
- *
- * @param payoutCollectionID
- * @param options Object Options for http config
- * @returns {*}
- * @link https://www.billplz.com/api?shell#v4-payout-collections-get-a-payout-collection
- */
-/*__getPayoutCollection(
-  payoutCollectionID = null,
-    options: { apiKey?: string } = {},
-) {
-  const url =
-    this.getUrl(this.CONSTANTS.VERSION_V4) +
-    '/mass_payment_instruction_collections/' +
-    (payoutCollectionID || this.payoutCollectionID);
-  const api = this.getApiCaller(
-    HttpMethod.GET,
-    url,
-    'getPayoutCollection',
-  );
-  return api(options);
-};*/
-
-/**
- *
- * @param data Object
- * @param options Object Options for http config
- * @returns {*}
- * @link https://www.billplz.com/api?shell#v4-payout-create-a-payout
- */
-/*__createPayout(data, options = {}) {
-  const url =
-    this.getUrl(this.CONSTANTS.VERSION_V4) + '/mass_payment_instructions';
-  const api = this.getApiCaller(HttpMethod.POST, url, 'createPayout');
-  return api(data, options);
-};*/
-
-/**
- *
- * @param payoutID
- * @param options Object Options for http config
- * @returns {*}
- * @link https://www.billplz.com/api?shell#v4-payout-get-a-payout
- */
-/*__getPayout(payoutID = null, options = {}) {
-  const url =
-    this.getUrl(this.CONSTANTS.VERSION_V4) +
-    '/mass_payment_instructions/' +
-    (payoutID || this.payoutID);
-  const api = this.getApiCaller(HttpMethod.GET, url, 'getPayout');
-  return api(options);
 };*/
 
 /**
